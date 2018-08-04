@@ -41,7 +41,7 @@ public class AlarmActivity
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, alarmTimer.getCurrentHour());
         calendar.set(Calendar.MINUTE, alarmTimer.getCurrentMinute());
-        if(gmtButton.isChecked()){
+        if (gmtButton.isChecked()) {
             calendar.setTimeZone(TimeZone.getTimeZone("GMT"));
         }
         return calendar;
@@ -63,7 +63,7 @@ public class AlarmActivity
         });
 
         recButton.setOnClickListener(view -> {
-            Alarm alarm = new Alarm(UUID.randomUUID().toString(), true, getCalendarFromTimerPicker(), 0, "", false);
+            Alarm alarm = new Alarm(UUID.randomUUID().toString(), true, getCalendarFromTimerPicker(), new boolean[7], "", false);
             alarms.add(alarm);
             alarmViewAdapter.notifyDataSetChanged();
             Toast.makeText(this, "Added alarm with specified time", Toast.LENGTH_LONG).show();

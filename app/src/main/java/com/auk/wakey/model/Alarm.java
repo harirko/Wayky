@@ -6,7 +6,7 @@ public class Alarm {
 
     private String uid;
 
-    private int repeats;
+    private boolean[] repeats;
 
     private boolean isOn;
 
@@ -16,7 +16,7 @@ public class Alarm {
 
     private boolean avoidGovHolildays;
 
-    public Alarm(String uid, boolean isOn, Calendar alarmDate, int repeats, String ringtoneUrl, boolean avoidGovHolildays) {
+    public Alarm(String uid, boolean isOn, Calendar alarmDate, boolean[] repeats, String ringtoneUrl, boolean avoidGovHolildays) {
         this.alarmDate = alarmDate;
         this.ringtoneUrl = ringtoneUrl;
         this.avoidGovHolildays = avoidGovHolildays;
@@ -33,11 +33,11 @@ public class Alarm {
         this.uid = uid;
     }
 
-    public int getRepeats() {
+    public boolean[] getRepeats() {
         return this.repeats;
     }
 
-    public void setRepeats(Integer repeats) {
+    public void setRepeats(boolean[] repeats) {
         this.repeats = repeats;
     }
 

@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.auk.wakey.R;
@@ -44,13 +43,8 @@ public class AlarmViewAdapter extends RecyclerView.Adapter<AlarmViewAdapter.Alar
     public void onBindViewHolder(@NonNull AlarmViewHolder alarmViewHolder, int i) {
         Alarm alarm = alarms.get(i);
         alarmViewHolder.alarmIsOn.setChecked(alarm.getIsOn());
-        alarmViewHolder.itemView.setOnClickListener(view -> {
-            alarmViewHolder.alarmIsOn.setChecked(!alarm.getIsOn());
-        });
-        alarmViewHolder.alarmIsOn.setOnCheckedChangeListener((compoundButton, b) -> {
-            alarm.setIsOn(b);
-
-        });
+        alarmViewHolder.alarmIsOn.setOnCheckedChangeListener((compoundButton, b) -> alarm.setIsOn(b));
+        alarmViewHolder.alarmDaysToggle.setOnDaysChangedListener(alarm::setRepeats);
         //TODO get is24 from SharedPreferences
         String time = TimeFormatFactory.getFormat(alarm.getAlarmDate(), false);
         alarmViewHolder.alarmTimer.setText(time);
@@ -69,7 +63,6 @@ public class AlarmViewAdapter extends RecyclerView.Adapter<AlarmViewAdapter.Alar
 
     static class TimeFormatFactory {
         static String getFormat(Calendar calendar, boolean is24) {
-
             return SimpleDateFormat.getTimeInstance(DateFormat.SHORT).format(calendar.getTime()) + " " + calendar.getTimeZone().getDisplayName();
         }
     }
