@@ -22,7 +22,7 @@ public class AlarmHandler {
     private static final int UPDATED = 0;
     private static final int FAILED = 1;
     private static String TAG = "AlarmHandler";
-    List<OnStorageUpdate> lists = new LinkedList<>();
+    List<onAlarmUpdate> lists = new LinkedList<>();
     private String dbFilename = "data.json";
     private Gson gson;
     private List<Alarm> alarms;
@@ -54,7 +54,6 @@ public class AlarmHandler {
 
         try {
             InputStream inputStream = context.openFileInput(dbFilename);
-
             if (inputStream != null) {
                 InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
@@ -127,32 +126,47 @@ public class AlarmHandler {
         thread.start();
     }
 
-    public void addAlarm(Alarm alarm, OnStorageUpdate onStorageUpdate) {
-        if (onStorageUpdate == null || alarm == null) {
+    public void addAlarm(Alarm alarm, onAlarmUpdate onAlarmUpdate) {
+        if (onAlarmUpdate == null || alarm == null) {
             return;
         }
         alarms.add(alarm);//TODO add to db and call based on result and do it with queue
         Thread thread = new Thread(() -> {
-            String data = gson.toJson(alarms, List.class);
+            String data = gson.toJson(alarms, new TypeToken<List<Alarm>>() {
+            }.getType());
             if (writeJSON(data)) {
-                onStorageUpdate.onStorageUpdate(alarm, true);
+                onAlarmUpdate.onAlarmUpdate(alarm, true);
             } else {
-                onStorageUpdate.onStorageUpdate(null, false);
+                onAlarmUpdate.onAlarmUpdate(null, false);
             }
         });
         thread.start();
     }
 
-    public void removeAlarm(Alarm alarm, OnStorageUpdate onStorageUpdate) {
-        if (onStorageUpdate == null) {
+    //TODO remove from list only if the db updates
+    public void removeAlarm(Alarm alarm, onAlarmUpdate onAlarmUpdate) {
+        if (onAlarmUpdate == null) {
             return;
         }
-        //TODO remove from db and call based on result and do it with queue
-        onStorageUpdate.onStorageUpdate(alarm, true);
+        if (!alarms.remove(alarm)) {
+            Log.e(TAG, "Alarm not found to delete");
+            onAlarmUpdate.onAlarmUpdate(null, false);
+            return;
+        }
+        Thread thread = new Thread(() -> {
+            String data = gson.toJson(alarms, new TypeToken<List<Alarm>>() {
+            }.getType());
+            if (writeJSON(data)) {
+                onAlarmUpdate.onAlarmUpdate(alarm, true);
+            } else {
+                onAlarmUpdate.onAlarmUpdate(null, false);
+            }
+        });
+        thread.start();
     }
 
-    public interface OnStorageUpdate {
-        void onStorageUpdate(Alarm alarm, boolean didUpdate);
+    public interface onAlarmUpdate {
+        void onAlarmUpdate(Alarm alarm, boolean didUpdate);
     }
 
     public interface OnAlarmsUpdate {

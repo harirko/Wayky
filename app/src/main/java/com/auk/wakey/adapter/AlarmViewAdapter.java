@@ -54,6 +54,16 @@ public class AlarmViewAdapter extends RecyclerView.Adapter<AlarmViewAdapter.Alar
                         Toast.makeText(context, "Updated in db", Toast.LENGTH_SHORT).show();
                     }));
         });
+        alarmViewHolder.itemView.setOnLongClickListener(view -> {
+            alarmHandler.removeAlarm(alarm, (alms, didUpdate) -> new Handler(context.getMainLooper()).post(() -> {
+
+                if (didUpdate) {
+                    Toast.makeText(context, "Updated in db", Toast.LENGTH_SHORT).show();
+                    notifyDataSetChanged();
+                }
+            }));
+            return true;
+        });
         alarmViewHolder.alarmDaysToggle.setOnDaysChangedListener(alarm::setRepeats);
         //TODO get is24 from SharedPreferences
         String time = TimeFormatFactory.getFormat(alarm.getAlarmDate(), false);
