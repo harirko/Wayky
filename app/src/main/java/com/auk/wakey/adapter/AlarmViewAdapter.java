@@ -1,6 +1,7 @@
 package com.auk.wakey.adapter;
 
 import android.content.Context;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,7 +10,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.auk.wakey.AlarmHandler;
 import com.auk.wakey.R;
 import com.auk.wakey.model.Alarm;
 import com.auk.wakey.view.DaysToggle;
@@ -26,6 +29,7 @@ public class AlarmViewAdapter extends RecyclerView.Adapter<AlarmViewAdapter.Alar
 
     private final Context context;
     private final List<Alarm> alarms;
+    private AlarmHandler alarmHandler = AlarmHandler.getInstance();
 
     public AlarmViewAdapter(Context context, List<Alarm> alarms) {
         this.context = context;
@@ -43,14 +47,19 @@ public class AlarmViewAdapter extends RecyclerView.Adapter<AlarmViewAdapter.Alar
     public void onBindViewHolder(@NonNull AlarmViewHolder alarmViewHolder, int i) {
         Alarm alarm = alarms.get(i);
         alarmViewHolder.alarmIsOn.setChecked(alarm.getIsOn());
-        alarmViewHolder.alarmIsOn.setOnCheckedChangeListener((compoundButton, b) -> alarm.setIsOn(b));
+        alarmViewHolder.alarmIsOn.setOnCheckedChangeListener((compoundButton, b) -> {
+            alarm.setIsOn(b);
+            alarmHandler.setAlarms(alarms, (alms, didUpdate) ->
+                    new Handler(context.getMainLooper()).post(() -> {
+                        Toast.makeText(context, "Updated in db", Toast.LENGTH_SHORT).show();
+                    }));
+        });
         alarmViewHolder.alarmDaysToggle.setOnDaysChangedListener(alarm::setRepeats);
         //TODO get is24 from SharedPreferences
         String time = TimeFormatFactory.getFormat(alarm.getAlarmDate(), false);
         alarmViewHolder.alarmTimer.setText(time);
         alarmViewHolder.alarmDescription.setText("Morning Alarm");
-        if (alarm.getRingtoneUrl() == null) return;
-        if (alarm.getRingtoneUrl().isEmpty()) {
+        if (alarm.getRingtoneUrl() == null || alarm.getRingtoneUrl().isEmpty()) {
             alarmViewHolder.alarmRingtoneButton.setText("Default Ringtone");
         }
         alarmViewHolder.alarmRingtoneButton.setText(alarm.getRingtoneUrl());
