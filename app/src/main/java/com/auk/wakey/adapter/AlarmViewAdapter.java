@@ -71,8 +71,9 @@ public class AlarmViewAdapter extends RecyclerView.Adapter<AlarmViewAdapter.Alar
         alarmViewHolder.alarmDescription.setText("Morning Alarm");
         if (alarm.getRingtoneUrl() == null || alarm.getRingtoneUrl().isEmpty()) {
             alarmViewHolder.alarmRingtoneButton.setText("Default Ringtone");
+        } else {
+            alarmViewHolder.alarmRingtoneButton.setText(alarm.getRingtoneUrl());
         }
-        alarmViewHolder.alarmRingtoneButton.setText(alarm.getRingtoneUrl());
     }
 
     @Override

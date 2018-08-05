@@ -24,7 +24,6 @@
             android:layout_height="wrap_content" />
 
         <Button
-            android:text="Default Ringtone"
             android:id="@+id/alarmRingtoneButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
