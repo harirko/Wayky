@@ -47,6 +47,7 @@ public class AlarmViewAdapter extends RecyclerView.Adapter<AlarmViewAdapter.Alar
     public void onBindViewHolder(@NonNull AlarmViewHolder alarmViewHolder, int i) {
         Alarm alarm = alarms.get(i);
         alarmViewHolder.alarmIsOn.setChecked(alarm.getIsOn());
+        alarmViewHolder.alarmDaysToggle.setRepeatedDays(alarm.getRepeats());
         alarmViewHolder.alarmIsOn.setOnCheckedChangeListener((compoundButton, b) -> {
             alarm.setIsOn(b);
             alarmHandler.setAlarms(alarms, (alms, didUpdate) ->
@@ -64,7 +65,14 @@ public class AlarmViewAdapter extends RecyclerView.Adapter<AlarmViewAdapter.Alar
             }));
             return true;
         });
-        alarmViewHolder.alarmDaysToggle.setOnDaysChangedListener(alarm::setRepeats);
+        alarmViewHolder.alarmDaysToggle.setOnDaysChangedListener(days -> {
+            alarm.setRepeats(days);
+            alarmHandler.setAlarms(alarms, (alms, didUpdate) -> new Handler(context.getMainLooper()).post(() -> {
+                if (didUpdate) {
+                    Toast.makeText(context, "Days changed", Toast.LENGTH_LONG).show();
+                }
+            }));
+        });
         //TODO get is24 from SharedPreferences
         String time = TimeFormatFactory.getFormat(alarm.getAlarmDate(), false);
         alarmViewHolder.alarmTimer.setText(time);
